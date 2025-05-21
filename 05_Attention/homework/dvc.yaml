@@ -1,0 +1,24 @@
+stages:
+  download_data:
+    cmd:
+      - mkdir runtime || true
+      - cd runtime && wget -O news.zip -qq --no-check-certificate "https://drive.google.com/uc?export=download&id=1hIVVpBqM6VU4n3ERkKq4tFaH4sKN0Hab" && unzip news.zip
+    outs:
+      - runtime/news.csv
+  train:
+    cmd:
+      - python3 train.py
+    deps:
+      - prepare_datasets.py
+      - .vector_cache
+    outs:
+      - model
+  demo:
+    cmd:
+      - python3 demo.py
+    deps:
+      - runtime/news.csv
+      - model
+    outs:
+      - model
+
