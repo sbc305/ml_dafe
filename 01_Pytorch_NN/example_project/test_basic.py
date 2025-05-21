@@ -5,13 +5,13 @@ from train import compute_accuracy
 
 def test_arange_elems():
     arr = torch.arange(0, 10, dtype=torch.float)
-    assert torch.allclose(arr[-1], torch.tensor([9]))
+    assert torch.allclose(arr[-1], torch.tensor([9], dtype=torch.float))
 
 def test_div_zero():
-    a = torch.zeros(1,dtype=torch.long)
-    b = torch.ones(1,dtype=torch.long)
+    a = torch.zeros(1, dtype=torch.long)
+    b = torch.ones(1, dtype=torch.long)
 
-    assert torch.isfinite(b/a)
+    assert torch.isinf(b/a)
 
 
 def test_div_zero_python():
@@ -32,7 +32,7 @@ def test_accuracy():
 @pytest.mark.parametrize("preds,targets,result",[
     (torch.tensor([1,2,3]),torch.tensor([1,2,3]), 1.0),
     (torch.tensor([1,2,3]),torch.tensor([0,0,0]), 0.0),
-    (torch.tensor([1,2,3]),torch.tensor([1,2,0]), 2/5),
+    (torch.tensor([1,2,3]),torch.tensor([1,2,0]), 2/3),
     ])
 def test_accuracy_parametrized(preds, targets, result):
     assert torch.allclose(compute_accuracy(preds, targets), torch.tensor([result]), rtol=0, atol=1e-5)
