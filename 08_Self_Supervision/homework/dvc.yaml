@@ -1,0 +1,41 @@
+stages:
+  download_data:
+    cmd:
+      - wget https://github.com/brendenlake/omniglot/raw/master/python/images_evaluation.zip && unzip -qq images_evaluation.zip
+      - wget https://github.com/brendenlake/omniglot/raw/master/python/images_background.zip && unzip -qq images_background.zip
+    outs:
+      - images_background
+      - images_evaluation
+  train:
+    cmd:
+      - python3 train.py
+    deps:
+      - load_data.py
+      - images_background
+      - images_evaluation
+    outs:
+      - checkpoints
+  demo:
+    cmd:
+      - python3 demo.py
+    deps:
+      - images_background
+      - images_evaluation
+      - checkpoints
+    outs:
+      - test_inference.png
+  train_resnet:
+    cmd:
+      - python3 resnet.py
+    outs:
+      - data
+      - checkpoints
+  resnet_vs_protonet:
+    cmd:
+      - python3 resnet_vs_protonet.py
+    deps:
+      - checkpoints
+      - data
+    outs:
+      - resnet_vs_protonet
+
