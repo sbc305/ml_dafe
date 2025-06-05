@@ -8,6 +8,7 @@ import game.flappy_bird_utils as flappy_bird_utils
 FPS = 30
 SCREENWIDTH = 288
 SCREENHEIGHT = 512
+MAXVELOCITY_X = 30
 
 pygame.init()
 FPSCLOCK = pygame.time.Clock()
@@ -80,7 +81,7 @@ class GameState:
             pipeMidPos = pipe['x'] + PIPE_WIDTH / 2
             if pipeMidPos <= playerMidPos < pipeMidPos + 4:
                 self.score += 1
-                reward = 1  # FIXME придумайте стратегию награды/наказания
+                reward = 10  # FIXME придумайте стратегию награды/наказания
 
         # playerIndex basex change
         if (self.loopIter + 1) % 3 == 0:
@@ -125,7 +126,7 @@ class GameState:
         if isCrash:
             terminal = True
             self.__init__()
-            reward = -1  # FIXME придумайте стратегию награды/наказания
+            reward = -10  # FIXME придумайте стратегию награды/наказания
 
         # draw sprites
         SCREEN.blit(IMAGES['background'], (0, 0))
@@ -147,6 +148,26 @@ class GameState:
         FPSCLOCK.tick(FPS)
 
         return image_data, reward, terminal
+
+    def get_next_pipe(self):
+        right_pipes = [pipe for pipe in self.upperPipes if pipe['x'] + PIPE_WIDTH > self.playerx]
+
+        if not right_pipes:
+            return None
+
+        next_pipe = min(right_pipes, key=lambda p: p['x'])
+        return next_pipe
+
+    def player_state(self):
+        next_pipe = self.get_next_pipe()
+        dx = (self.playerx - next_pipe["x"]) / SCREENWIDTH
+        dy = (self.playery - next_pipe["y"] + PIPEGAPSIZE/2 ) / SCREENHEIGHT
+        vx =  self.pipeVelX / MAXVELOCITY_X
+        vy =  self.playerVelY / self.playerMaxVelY
+        return dx, dy, vx, vy
+
+
+
 
 
 def getRandomPipe():
